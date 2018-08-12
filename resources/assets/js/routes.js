@@ -6,7 +6,6 @@ import RouteGrade from './routes/grades.js';
 import RouteSection from './routes/sections.js';
 import RouteStudent from './routes/students.js';
 
-
 const NotFoundPage = {
 	template: '<div class="jumbotron"><h1>Page Not Found</h1></div>'
 }

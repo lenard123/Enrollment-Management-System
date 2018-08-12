@@ -1,4 +1,8 @@
 {
+    "/student.js": "/student.js",
+    "/section.js": "/section.js",
+    "/requirement.js": "/requirement.js",
+    "/grade.js": "/grade.js",
     "/js/app.js": "/js/app.js",
     "/css/app.css": "/css/app.css"
 }

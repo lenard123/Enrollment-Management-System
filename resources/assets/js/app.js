@@ -14,6 +14,7 @@ let cp = './components/mycomponents/'; //Component Path
 
 Vue.component('panelDefault', require(`${cp}panel_default.vue`));
 Vue.component('formGroup', require(`${cp}form_group.vue`));
+Vue.component('tableStudent', require(`${cp}table_student.vue`));
 
 Vue.component('modal', require(`${cp}modal/modal.vue`));
 Vue.component('modalHeader', require(`${cp}modal/header.vue`));
@@ -29,6 +30,7 @@ const router = new VueRouter({
 const app = new Vue({
 	created: function () {
 		this.util.setAuthorization();
+		this.util.log(this);
 	},
 
     router,

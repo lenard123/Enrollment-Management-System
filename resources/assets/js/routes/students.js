@@ -1,8 +1,8 @@
 import DefaultComponent from './defaultComponent.vue';
-import StudentsAll from '../components/student/all.vue';
-import StudentAdd from '../components/student/add.vue';
-import StudentEdit from '../components/student/edit.vue';
-import StudentEnroll from '../components/student/enroll.vue';
+const StudentsAll = ()=> import(/* webpackChunkName: "student" */'../components/student/all.vue');
+const StudentAdd = ()=> import(/* webpackChunkName: "student" */'../components/student/add.vue');
+const StudentEdit = ()=> import(/* webpackChunkName: "student" */'../components/student/edit.vue');
+const StudentEnroll = ()=> import(/* webpackChunkName: "student" */'../components/student/enroll.vue');
 
 export default{
 	path: 'student',
@@ -10,7 +10,7 @@ export default{
 	children: [
 
 		{
-			path: 'all',
+			path: '/student/:type',
 			component: StudentsAll,
 			name: 'All Student'
 		},
@@ -31,8 +31,8 @@ export default{
 			component: StudentEdit,
 			name: 'Edit Student',
 			beforeEnter: (to, from, next) => {
-				if (from.name != "All Student")
-					next({name: 'All Student'});
+				if (from.name != "All Student" && from.name != "Enroll Student" && from.name != "Section Student")
+					next({name: 'All Student', params: {type:'all'}});
 				else next();
 			}
 		},
@@ -43,7 +43,7 @@ export default{
 			name: 'Enroll Student',
 			beforeEnter: (to, from, next) => {
 				if (from.name != 'Edit Student')
-					next({name: 'Edit Student', params:to.params});
+					next({name: 'All Student'});
 				else next();
 			}
 		}

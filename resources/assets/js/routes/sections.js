@@ -1,7 +1,8 @@
 import DefaultComponent from './defaultComponent.vue';
-import Section from '../components/section/section.vue';
-import SectionAdd from '../components/section/add.vue';
-import SectionEdit from '../components/section/edit.vue';
+const Section = ()=> import(/* webpackChunkName: "section" */'../components/section/section.vue');
+const SectionAdd = ()=> import(/* webpackChunkName: "section" */'../components/section/add.vue');
+const SectionEdit = ()=> import(/* webpackChunkName: "section" */'../components/section/edit.vue');
+const SectionStudent = ()=> import(/* webpackChunkName: "section" */'../components/section/students.vue');
 
 export default{
 	path: 'section',
@@ -33,6 +34,18 @@ export default{
 			beforeEnter: (to, from, next) => {
 				if (from.name != 'Manage Section')
 					next({name:'Manage Section'});
+				else next();
+			}
+		},
+
+		{
+			path: 'section/:id',
+			component: SectionStudent,
+			name: 'Section Student',
+			props: true,
+			beforeEnter: (to, from, next) => {
+				if (from.name != 'Manage Section' && from.name != 'Edit Student')
+					next({name: 'Manage Section'});
 				else next();
 			}
 		}

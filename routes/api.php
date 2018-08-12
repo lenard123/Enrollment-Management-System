@@ -13,10 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::prefix('v1')->group(function(){
 	Route::post('admin/login', 'API\v1\Admin\LoginController');
 
@@ -40,40 +36,15 @@ Route::prefix('v1')->group(function(){
 		Route::delete('section/{id}', 'API\v1\Section\DeleteController');
 
 		Route::get('student', 'API\v1\Student\GetController');
+		Route::get('student/enrolled', 'API\v1\Student\GetController@enrolled');
+		Route::get('student/pending', 'API\v1\Student\GetController@pending');
+		Route::get('student/section/{id}', 'API\v1\Student\GetController@section');
+		
 		Route::get('student/{id}', 'API\v1\Student\ShowController');
 		Route::post('student', 'API\v1\Student\AddController');
+		Route::post('student/{id}/enroll', 'API\v1\Student\EnrollController');
 		Route::put('student/{id}', 'API\v1\Student\UpdateController');
-		Route::delete('student/{id}', 'API\v1\Student\DeleteController');
-
-/*
-+---------------+
-| students		|
-|---------------|
-| fname 		|
-| lname 		|
-| address 		|
-| number 		|
-| birthday		|
-| studentid 	|
-| grade_id  	|
-+---------------+
-
-+---------------+
-| enroll_student|
-|---------------|
-| student_id	|
-| section_id	|
-+---------------+
-*/		
+		Route::delete('student/{id}', 'API\v1\Student\DeleteController');	
 	});
 
-});
-
-
-Route::get('test', function(Request $request){
-	$x = [];
-	foreach ($request->requirements as $key => $value) {
-		$x[$key] = $value;
-	}
-	return response()->json($x);
 });

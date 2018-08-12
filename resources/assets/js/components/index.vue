@@ -49,13 +49,24 @@
 
 								<router-link 
 									tag="li"
-									:to="{name:'All Student'}"
+									:to="{name:'All Student', params:{type:'all'}}"
 									active-class="active">
 									<a href="#">All Students</a>
 								</router-link>
 								
-								<li><a href="#">Enrolled Students</a></li>
-								<li><a href="#">Pending Students</a></li>
+								<router-link 
+									tag="li"
+									:to="{name:'All Student', params:{type:'enrolled'}}"
+									active-class="active">
+									<a href="#">Enrolled Students</a>
+								</router-link>
+
+								<router-link 
+									tag="li"
+									:to="{name:'All Student', params:{type:'pending'}}"
+									active-class="active">
+									<a href="#">Pending Students</a>
+								</router-link>
 							</ul>
 						</li>
 
@@ -83,7 +94,7 @@
 			</div>
 		</nav>
 
-		<router-view></router-view>
+		<div style="margin-top: 30px;"><router-view></router-view></div>
 
 	</div>
 </div>
@@ -112,6 +123,11 @@ export default{
 					vm.data.user = response.data;
 				})
 				.catch(error=>{
+					if (error.response.status === 401) {
+						this.util.clearAuthorization();
+						this.$router.push({name: 'Login'});
+						return;
+					}
 					vm.util.log(error);
 					vm.status = 'error';
 				});

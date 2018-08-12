@@ -18,7 +18,11 @@
 
 <div id="error"></div>
 
-<script>const DEBUG = {{ env('APP_DEBUG', false) }}</script>
+<script>
+	//configuration
+	const DEBUG = {{ env('APP_DEBUG', false) }};
+	const BASE_URL = `{{ asset('') }}`;
+</script>
 <script src="{{ asset('js/app.js') }}"></script>
 
 </body>

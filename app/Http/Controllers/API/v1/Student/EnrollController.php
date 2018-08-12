@@ -10,23 +10,24 @@ use App\Student;
 
 class EnrollController extends Controller
 {
-    public function __invoke(Request $request)
+    public function __invoke(Request $request, $id)
     {
 
     	$request->requirements = $this->getRequirements($request); 
 
-    	$this->validateRequest($request);
-
-    	$es = EnrollStudent::findOrCreate(['student_id'=>request('student_id')]);
+    	$es = EnrollStudent::firstOrCreate(['student_id'=>$id]);
 
     	$this->insertRequirement($request, $es);
 
-    	if ($this->chkRequirements($es))
-    		$es->update(['section_id', $request->section_id]);
+    	if ($this->chkRequirements($es)) {
+            $es->section_id = $request->section_id == 0 ? null : $request->section_id;
+            $es->save();
+        }
 
     	return response()->json([
     		'status' => 'success',
-    		'message' => '';
+    		'message' => 'Success.',
+            'test' => $this->chkRequirements($es)
     	]);
     }
 
@@ -39,7 +40,7 @@ class EnrollController extends Controller
     	foreach ($grade_requirements as $key => $gr) {
     		$hasRequirement = false;
     		foreach ($student_requirements as $keys => $sr) 
-    			if ($gr->id == $sr->requirement_id) $hasRequirement = true;
+    			if ($gr->requirement_id == $sr->requirement_id) $hasRequirement = true;
     		if (!$hasRequirement) return false;
     	}
 
@@ -65,12 +66,5 @@ class EnrollController extends Controller
     		$student_requirement['requirement_id'] = $requirement;
     		StudentRequirement::create($student_requirement);
     	}
-    }
-
-    private function validateRequest($request)
-    {
-    	$this->validate($request, [
-    		'student_id' => 'required|exists:students,id'
-    	]);
     }
 }

@@ -1,6 +1,6 @@
 <template>
 <panel-default>
-	<div v-if="status=='loading'" class="jumbotron">
+	<div v-if="status=='loading'">
 		<h1>Loading...<i class="fa fa-refresh fa-spin"></i></h1>
 	</div>
 	<div v-else-if="status=='error'" class="jumbotron">
@@ -41,18 +41,18 @@
 		<div class="panel panel-info">
 			<div class="panel-heading">Enroll Student</div>
 			<div class="panel-body">
-				<form>
+				<form v-on:submit.prevent="submit()">
 					<div class="form-group" v-if="grade_requirements.length > 0">
 						<label for="requirements">Requirements</label><br/>
 						<label class="checkbox-inline" v-for="requirement in grade_requirements">
-							<input type="checkbox" name="requirements" :value="requirement.requirement_id">
+							<input type="checkbox" name="requirements" :value="requirement.requirement_id" v-on:change="requires(requirement.requirement_id)">
 								{{ getRequirement(requirement.requirement_id) }}
 						</label>
 					</div>
 					<div class="form-group">
 						<label for="section_id">Section</label>
-						<select class="form-control">
-							<option>---Select Section---</option>
+						<select class="form-control" v-model="section_id" :disabled="!hasPassedAllRequirements">
+							<option value="0">---Select Section---</option>
 							<option v-for="section in sections" :value="section.id">
 								{{ section.name }}
 							</option>
@@ -60,7 +60,7 @@
 					</div>
 					<div class="form-group">
 						<input type="submit" value="Submit" class="btn btn-success"/>
-						<input type="button" value="Back" class="btn btn-default"/>
+						<input type="button" value="Back" @click="back()" class="btn btn-default"/>
 					</div>
 				</form>
 			</div>
@@ -74,7 +74,9 @@ export default{
 	data: function () {
 		return {
 			status : 'loading',
+			loading: false,
 			sections : [],
+			section_id: 0,
 			grade_requirements: [],
 			student_requirements: [],
 			enroll: {}
@@ -87,12 +89,60 @@ export default{
 	},
 
 	methods: {
+
+		submit: function () {
+			if (this.loading) return;
+			
+			this.loading = true;
+			this.util.notify('Submitting data, please wait...', 'loading');
+			
+			let params = {};
+			let vm = this;
+			let url = this.data.API+`student/${this.id}/enroll`;
+
+			params.requirements = this.student_requirements;
+			params.section_id = this.section_id;
+			
+			axios.post(url, params)
+				.then((response)=>{
+					vm.loading = false;
+					$.notifyClose();
+					if (vm.util.showResult(response, 'success'))
+						vm.back();
+				}).catch((error)=>{
+					vm.loading = false;
+					$.notifyClose();
+					vm.util.showResult(error, 'error');
+				})
+
+		},
+
+		requires: function (id) {
+			this.$nextTick(function(){
+				if (this.isChecked(id)) {
+					this.student_requirements.push(id);
+				} else {
+					let i = this.student_requirements.indexOf(id);
+					this.student_requirements.splice(i,1);
+				}
+			})
+
+		},
+
+		isChecked: function (id) {
+				return $(`[type=checkbox][value=${id}]`).prop('checked')
+		},
+
 		getRequirement: function (id) {
 			let requirements = this.data.requirements;
 			for (var i in requirements)
 				if (requirements[i]['id'] == id)
 					return requirements[i]['name'];
 			return '';
+		},
+
+		back: function(){
+			this.$router.go(-1);
 		},
 
 		getStudentInfo: function () {
@@ -105,9 +155,20 @@ export default{
 					vm.sections = response.data.section;
 					vm.grade_requirements = response.data.grade_requirement;
 					vm.enroll = response.data.enroll;
+					vm.section_id = response.data.enroll.section_id ?
+										response.data.enroll.section_id : 0; 
+
+					this.$nextTick(()=>{
+						response.data.student_requirements.map((requirement)=>{
+							let cb = $(`[type=checkbox][value=${requirement.requirement_id}]`);
+							cb.prop('checked', true);
+							cb.prop('disabled', true);
+							vm.student_requirements.push(requirement.requirement_id);
+						});
+					});
 				})
 				.catch(error=>{
-					console.log(error);
+					vm.util.log(error)
 					vm.status = 'error';
 				})
 		},
@@ -139,7 +200,18 @@ export default{
 		},
 
 		hasPassedAllRequirements: function () {
-			if ()
+			let grade_requirements = this.grade_requirements;
+			let student_requirements = this.student_requirements;
+
+			let hasStudentRequirement = (grade_requirement) => {
+				for (var i in student_requirements)
+					if (student_requirements[i] == grade_requirement) return true;
+				return false;
+			}
+
+			return grade_requirements.every((requirement)=>{
+				return hasStudentRequirement(requirement.requirement_id);
+			});
 		}
 	}
 }

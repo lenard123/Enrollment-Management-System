@@ -1,7 +1,7 @@
-import DefaultComponent from './defaultComponent.vue';
-import GradeIndex from '../components/grade/index.vue';
-import GradeAdd from '../components/grade/add.vue';
-import GradeEdit from '../components/grade/edit.vue';
+import DefaultComponent from './defaultComponent.vue'; 
+const GradeIndex = ()=> import(/* webpackChunkName: "grade" */'../components/grade/index.vue');
+const GradeAdd = ()=> import(/* webpackChunkName: "grade" */'../components/grade/add.vue');
+const GradeEdit = ()=> import(/* webpackChunkName: "grade" */'../components/grade/edit.vue');
 
 export default			{
 	path: 'grade',

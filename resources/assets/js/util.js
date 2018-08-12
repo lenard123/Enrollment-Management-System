@@ -23,7 +23,7 @@ const methods = {
 	 *
 	 */
 	log: function (message) {
-		if (DEBUG) console.log(message);
+		 (DEBUG) && console.log(message);
 	},
 
 	/**
@@ -33,12 +33,11 @@ const methods = {
 	 * @param {Boolean}		if message will be closed imediately (true|false)
 	 * @return {Notify}		
 	 */
-	notify: function (message, label = 'info', progress) {
+	notify: function (message, label = 'info', progress, notify) {
 
-		let delay = 5000;
+		let delay = 3000;
 		let type = 'info';
 		let icon = 'fa fa-info';
-
 		switch (label) {
 			case 'error':
 				type = 'danger';
@@ -64,14 +63,28 @@ const methods = {
 				break;
 		}
 
-		return $.notify({
-			message: message,
-			icon: icon
-		}, {
-			type: type,
-			delay: delay,
-			placement: {from: 'top', align: 'center'}
-		});
+		if (notify == null){
+			return $.notify({
+				message: message,
+				icon: icon
+			}, {
+				type: type,
+				delay: delay,
+				placement: {from: 'top', align: 'center'}
+			});
+		}else{
+			notify.update({
+				message: message,
+				icon: icon,
+				type: type,
+				placement: {from: 'top', align: 'center'}
+			})
+			setTimeout(()=>{
+				notify.close();
+			}, delay);
+			return notify;
+		}
+
 	},
 
 
@@ -83,6 +96,10 @@ const methods = {
 		if (token != null) localStorage['Access Token'] = `Bearer ${token}`;
 		axios.defaults.headers.common['Authorization'] = localStorage['Access Token'];
 		$.ajaxSetup({headers:{'Authorization': localStorage['Access Token']}});
+	},
+
+	clearAuthorization: function () {
+		localStorage['Access Token'] = '';
 	},
 
 
@@ -138,35 +155,35 @@ const methods = {
 	 * @param 	{Type}		responseType (error|success)
 	 * @param 	{library}	Library used (ajax|axios) 		Default : axios
 	 */
-	showResult: function (response, type, library = 'axios') {
+	showResult: function (response, type, library = 'axios', notify) {
 		this.log (response);
 		var isSuccess = data => data.status == 'success'; 
 		if (library == 'axios') {
 			if (type == 'success') {
 				if (isSuccess(response.data)) {
-					this.notify(response.data.message, 'success');
+					this.notify(response.data.message, 'success',0, notify);
 					return true;
 				} else {
-					this.notify(response.data.message, 'error');
+					this.notify(response.data.message, 'error',0, notify);
 				}
 			} else {
 				var status =  response.response ? response.response.status : 500;
 				var message = this.getErrorMessage(response.response.data, status);
-				this.notify(message, 'error');
+				this.notify(message, 'error',0, notify);
 				return status;
 			} 
 		} else if (library == 'ajax') {
 			if (type == 'success') {
 				if (isSuccess(response)) {
-					this.notify(response.message, 'success');
+					this.notify(response.message, 'success',0, notify);
 					return true;
 				} else {
-					this.notify(response.message, 'error');
+					this.notify(response.message, 'error',0, notify);
 				}
 			} else if (type == 'error') {
 				var status =  response.status;
 				var message = this.getErrorMessage(response.responseText, status);
-				this.notify(message, 'error');
+				this.notify(message, 'error',0, notify);
 				return status;
 			}
 		}
@@ -183,7 +200,7 @@ const methods = {
 }
 
 const data = {
-	API: 'http://localhost:8000/api/v1/',
+	API: `${BASE_URL}api/v1/`,
 
 	requirements: [],
 

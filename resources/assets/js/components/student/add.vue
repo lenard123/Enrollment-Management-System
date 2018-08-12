@@ -66,8 +66,7 @@ export default{
 
 	methods: {
 		back: function() {
-			this.$router.push({name: 'All Student', query:{loading:false}});
-			this.$nextTick(()=>this.$router.replace({name: 'All Student'}));
+			this.$router.go(-1)
 		},
 
 		submit: function() {

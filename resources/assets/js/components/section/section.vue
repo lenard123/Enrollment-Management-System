@@ -52,6 +52,9 @@
 						<td @click="id1=section.id;util.showModal('#delete_section_modal')">
 							<i class="fa fa-trash"></i> Delete
 						</td>
+						<router-link :to="{name: 'Section Student', params:{id:section.id}}" tag="td">
+							<button class="btn btn-primary">View Students</button>
+						</router-link>
 					</tr>
 				</tbody>
 			</table>				

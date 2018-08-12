@@ -1,7 +1,7 @@
 import DefaultComponent from './defaultComponent.vue';
-import RequirementIndex from '../components/requirement/index.vue';
-import RequirementAdd from '../components/requirement/add.vue';
-import RequirementEdit from '../components/requirement/edit.vue';
+const RequirementIndex = ()=> import(/* webpackChunkName: "requirement" */'../components/requirement/index.vue');
+const RequirementAdd = ()=> import(/* webpackChunkName: "requirement" */'../components/requirement/add.vue');
+const RequirementEdit = ()=> import(/* webpackChunkName: "requirement" */'../components/requirement/edit.vue');
 
 export default{
 	path: 'requirement',
